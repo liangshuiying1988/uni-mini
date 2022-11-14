@@ -77,7 +77,7 @@
 	 * @description uniCloud云端一体搜索模板，自带下拉候选、历史搜索、热搜。无需再开发服务器代码
 	 */
 	const searchLogDbName = 'opendb-search-log'; // 搜索记录数据库
-	const mallGoodsDbName = 'opendb-news-articles'; // 文章数据库
+	const goodsDbName = 'opendb-news-articles'; // 商品数据库
 	const associativeSearchField = 'title'; // 联想时，搜索框值检索数据库字段名
 	const associativeField = '_id,title'; // 联想列表每一项携带的字段
 	const localSearchListKey = '__local_search_history'; //	本地历史存储字段名
@@ -130,7 +130,7 @@
 	export default {
 		data() {
 			return {
-				mallGoodsDbName,
+				goodsDbName,
 				searchLogDbName,
 				statusBarHeight:'0px',
 				localSearchList: uni.getStorageSync(localSearchListKey),
@@ -148,7 +148,7 @@
 		created() {
 			this.db = uniCloud.database();
 			this.searchLogDb = this.db.collection(this.searchLogDbName);
-			this.mallGoodsDb = this.db.collection(this.mallGoodsDbName);
+			this.goodsDb = this.db.collection(this.goodsDbName);
 			// #ifndef H5
 			uni.onKeyboardHeightChange((res) => {
 				this.keyBoardPopup = res.height !== 0;
@@ -309,7 +309,7 @@
 		watch: {
 			searchText: debounce(function(value) {
 				if (value) {
-					this.mallGoodsDb.where({
+					this.goodsDb.where({
 						[associativeSearchField]: new RegExp(value, 'gi'),
 					}).field(associativeField).get().then(res => {
 						this.associativeList = res.result.data;

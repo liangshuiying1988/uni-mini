@@ -14,24 +14,24 @@
 		<!-- 头部轮播 -->
 		<view class="carousel-section">
 			<unicloud-db ref="bannerdb" v-slot:default="{data, loading}" collection="opendb-banner"
-				field="img_url,open_url" @load="onqueryload">
+				field="img_url,open_url">
 				<!-- 当无banner数据时显示占位图 -->
 				<image v-if="!(loading||data.length)" class="banner-image" src="/static/banner/empty.jpeg" mode="aspectFill" :draggable="false" />
 				<swiper v-else class="swiper-box" circular :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval"
 				:duration="duration">
 					<swiper-item v-for="(item) in data" :key="item._id">
-						<view class="uni-swiper-dot-box" @click="clickItem(item)">
-							<image class="banner-image" :src="item.img_url" mode="aspectFill" :draggable="false" />
+						<view class="uni-swiper-dot-box">
+							<image class="banner-image" :src="item.img_url" mode="aspectFill" :draggable="false" @click="clickBannerItem(item)"/>
 						</view>
 					</swiper-item>
 				</swiper>
 			</unicloud-db>
 		</view>
 
-		<!-- 分类 -->
+		<!-- 分类导航 -->
 		<view>
 			<unicloud-db ref="classify" v-slot:default="{data}" collection="classify"
-				field="classify_name,img_url,open_url" @load="onqueryload" class="cate-section">
+				field="classify_name,img_url,open_url" class="cate-section">
 				<view class="cate-item" v-for="(item) in data" :key="item.img_url">
 					<image :src='item.img_url' />
 					<text>{{item.classify_name}}</text>
@@ -39,45 +39,57 @@
 			</unicloud-db>
 		</view>
 
-		
+		<!-- 猜你喜欢 -->
+		<view class="f-header m-t">
+			<text class="iconfont icon-cainixihuanfuben like" />
+			<view class="tit-box">
+				<text class="tit">猜你喜欢</text>
+			</view>
+			<text class="iconfont icon-gengduo more" />
+		</view>
+		<view class="guess-section">
+			<view 
+				v-for="(item, index) in goodsList" :key="index"
+				class="guess-item"
+				@click="navToDetailPage(item)"
+			>
+				<view class="image-wrapper">
+					<image :src="item.image2" mode="aspectFill"></image>
+				</view>
+				<text class="title">{{item.title}}</text>
+				<text class="price">￥{{item.price}}</text>
+			</view>
+		</view>
 
 	</view>
 </template>
 
 <script>
 import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
+import JsonData  from "@/Json.js"
 
 import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
-const gps = new Gps(), db = uniCloud.database();
+const gps = new Gps(); //定位
 
 export default {
 	components: {
-		statusBar,
-		listTitle
-	},
-	computed: {
-		
+		statusBar
 	},
 	data() {
 		return {
 			keyword: "",
-			listHight: 0,
 			indicatorDots: true,
 			autoplay: true,
 			interval: 2000,
-			duration: 500
+			duration: 500,
+			goodsList: []
 		}
 	},
 	watch: {
 	},
-	async onReady() {
-		// #ifdef APP-NVUE
-		/* 可用窗口高度 - 搜索框高 - 状态栏高 */
-		this.listHight = uni.getSystemInfoSync().windowHeight - uni.getSystemInfoSync().statusBarHeight - 50 + 'px';
-		// #endif
-		// #ifndef APP-NVUE
-		this.listHight = 'auto'
-		// #endif
+	onReady() {
+		this.goodsList = JsonData.goodsList;
+		console.log('goodsList======',this.goodsList)
 	},
 	async onShow() {
 		this.keyword = getApp().globalData.searchText
@@ -103,26 +115,20 @@ export default {
 		// uni.hideLoading()
 	},
 	methods: {
+		//详情页
+		navToDetailPage(item) {
+			//测试数据没有写id，用title代替
+			let id = item.title;
+			uni.navigateTo({
+				url: `/pages/product/product?id=${id}`
+			})
+		},
 		searchClick(e) { //点击搜索框
 			uni.hideKeyboard();
 			uni.navigateTo({
 				url: '/pages/home/search/search',
 				animationType: 'fade-in'
 			});
-		},
-		retry() {
-			this.refresh()
-		},
-		/**
-		 * banner加载后触发的回调
-		 */
-		onqueryload(data) {
-		},
-		changeSwiper(e) {
-			this.current = e.detail.current
-		},
-		clickItem(e) {
-			this.swiperDotIndex = e
 		},
 		/**
 		 * 点击banner的处理
@@ -131,10 +137,7 @@ export default {
 			// 有外部链接-跳转url
 			if (item.open_url) {
 				uni.navigateTo({
-					url: '/pages/common/webview/webview?url=' + item.open_url + '&title=' + item.title,
-					success: res => {},
-					fail: () => {},
-					complete: () => {}
+					url: '/pages/common/webview/webview?url=' + item.open_url + '&title=' + item.title
 				});
 			}
 		}
@@ -142,17 +145,9 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-/* #ifndef APP-NVUE */
-view {
-	display: flex;
-	box-sizing: border-box;
-	flex-direction: column;
-}
-
-/* #endif */
+<style lang="scss">
 .index-pages {
-	background-color: #FFF;
+	background: #f5f5f5;
 }
 
 .carousel-section {
@@ -174,14 +169,15 @@ view {
 
 .cate-section {
 	display: flex;
+  justify-content: space-around;
 	padding: 30rpx 22rpx; 
 	background: #fff;
-	flex-direction:row;
 	.cate-item {
-		flex:1;
-		align-items: center;
 		font-size: $uni-font-size-sm + 2rpx;
 		color: $uni-text-color;
+		display: flex;
+    flex-direction: column;
+    align-items: center;
 		cursor: pointer;
 	}
 	image {
@@ -215,5 +211,74 @@ view {
 	/* #ifndef APP-NVUE */
 	z-index: 999;
 	/* #endif */
+}
+
+.f-header{
+	display:flex;
+	flex-direction: row;
+	height: 100rpx;
+	padding: 30rpx 30rpx 8rpx;
+	background: #fff;
+	.like{
+		color:$uni-color-primary;
+		font-size: $uni-img-size-base;
+		font-weight: 700;
+		line-height: $uni-img-size-lg - 2rpx;
+		margin-right: 16rpx;
+	}
+	.tit-box{
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	.tit,.more{
+		font-size: $uni-img-size-base +2rpx;
+		color: $uni-text-color;
+	}
+}
+.m-t{
+	margin-top: 16rpx;
+}
+
+/* 猜你喜欢 */
+.guess-section{
+	display:flex;
+	flex-wrap:wrap;
+	padding: 0 30rpx;
+	background: #fff;
+	.guess-item{
+		display:flex;
+		flex-direction: column;
+		width: 48%;
+		padding-bottom: 40rpx;
+		&:nth-child(2n+1){
+			margin-right: 4%;
+		}
+	}
+	.image-wrapper{
+		width: 100%;
+		height: 330rpx;
+		border-radius: 20rpx;
+		overflow: hidden;
+		image{
+			width: 100%;
+			height: 100%;
+			opacity: 1;
+		}
+	}
+	.title{
+		font-size: $uni-font-size-lg;
+		color: $uni-text-color;
+		line-height: $uni-font-size-lg + 40rpx;
+		overflow: hidden;//溢出隐藏
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.price{
+		font-size: $uni-font-size-lg;
+		color: $uni-color-primary;
+		line-height: 1;
+		font-weight: 600;
+	}
 }
 </style>
