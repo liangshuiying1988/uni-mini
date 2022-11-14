@@ -149,12 +149,7 @@
 				url,
 				title
 			}) {
-				uni.navigateTo({
-					url: '/pages/common/webview/webview?url=' + url + '&title=' + title,
-					success: res => {},
-					fail: () => {},
-					complete: () => {}
-				});
+				uni.navigateTo({});
 			}
 		}
 	}

@@ -84,13 +84,6 @@
 			}
 		},
 		{
-			"path": "pages/common/webview/webview",
-			"style": {
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
 			"path": "pages/ucenter/invite/invite",
 			"style": {
 				"navigationStyle": "custom",

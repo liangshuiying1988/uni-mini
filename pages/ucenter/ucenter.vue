@@ -76,41 +76,17 @@
 					[
 						// #ifdef APP-PLUS
 						{
-							"title": this.$t('mine.signInByAd'),
-							"event": 'signInByAd',
-							"icon": "compose"
-						},
-						// #endif
-						{
-							"title": this.$t('mine.signIn'),
-							"event": 'signIn',
-							"icon": "compose"
-						},
-						// #ifdef APP-PLUS
-						{
 							"title": this.$t('mine.toEvaluate'),
 							"event": 'gotoMarket',
 							"icon": "hand-thumbsup"
 						},
 						//#endif
 						{
-							"title":this.$t('mine.readArticles'),
-							"to": '/pages/ucenter/read-news-log/read-news-log',
-							"icon": "flag"
-						},
-						{
 							"title": this.$t('mine.myScore'),
 							"to": '',
 							"event": 'getScore',
 							"icon": "paperplane"
 						}
-						// #ifdef APP-PLUS
-						, {
-							"title": this.$t('mine.invite'),
-							"event": 'share',
-							"icon": "redo"
-						}
-						// #endif
 					],
 					[{
 						"title": this.$t('mine.feedback'),
@@ -174,12 +150,6 @@
 				uni.navigateTo({
 					url: "/pages/ucenter/settings/settings"
 				})
-			},
-			signIn() { //普通签到
-				this.$refs.signIn.open()
-			},
-			signInByAd(){ //看激励视频广告签到
-				this.$refs.signIn.showRewardedVideoAd()
 			},
 			/**
 			 * 个人中心项目列表点击事件

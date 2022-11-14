@@ -134,10 +134,10 @@ export default {
 		 * 点击banner的处理
 		 */
 		clickBannerItem(item) {
-			// 有外部链接-跳转url
+			// 跳转url
 			if (item.open_url) {
 				uni.navigateTo({
-					url: '/pages/common/webview/webview?url=' + item.open_url + '&title=' + item.title
+					url: item.open_url
 				});
 			}
 		}
