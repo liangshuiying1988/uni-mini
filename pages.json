@@ -12,9 +12,6 @@
 		{
 			"path": "pages/list/list",
 			"style": {
-				// #ifndef APP-PLUS
-				"enablePullDownRefresh": true,
-				// #endif
 				"navigationStyle": "custom"
 			}
 		},
@@ -115,13 +112,6 @@
 			}
 		},
 		{
-			"path": "pages/ucenter/read-news-log/read-news-log",
-			"style": {
-				"navigationBarTitleText": "阅读记录",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
 			"path": "pages/ucenter/invite/invite",
 			"style": {
 				"navigationStyle": "custom",
@@ -162,13 +152,13 @@
 		{
 			"path": "uni_modules/uni-id-pages/pages/login/login-withoutpwd",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "免密登录"
 			}
 		},
 		{
 			"path": "uni_modules/uni-id-pages/pages/login/login-withpwd",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "账密登录"
 			}
 		},
 		{
@@ -230,14 +220,12 @@
 		},
 		// #endif
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-starter",
-		"navigationBarBackgroundColor": "#FFFFFF",
+		"navigationBarTitleText": "小奇商城",
+		"navigationBarBackgroundColor": "#FFF",
 		"backgroundColor": "#F8F8F8",
 		"enablePullDownRefresh": false,
-		// "maxWidth":375,
 		"rpxCalcMaxDeviceWidth": 375,
 		"rpxCalcBaseDeviceWidth": 375
-		// "rpxCalcIncludeWidth":0
 	},
 	"condition": {
 		"list": [
@@ -254,33 +242,33 @@
 		"current": 1
 	},
 	"tabBar": {
-		"color": "#7A7E83",
-		"selectedColor": "#007AFF",
-		"borderStyle": "black",
-		"backgroundColor": "#FFFFFF",
+		"color": "#C0C4CC",
+		"selectedColor": "#ff6a6c",
+		"borderStyle": "white",
+		"backgroundColor": "#ffffff",
 		"list": [
 			{
 				"pagePath": "pages/home/index",
-				"iconPath": "static/tabbar/list.png",
-				"selectedIconPath": "static/tabbar/list_active.png",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath": "static/tabbar/home-active.png",
 				"text": "首页"
 			},
 			{
 				"pagePath": "pages/list/list",
-				"iconPath": "static/tabbar/list.png",
-				"selectedIconPath": "static/tabbar/list_active.png",
-				"text": "列表"
+				"iconPath": "static/tabbar/category.png",
+				"selectedIconPath": "static/tabbar/category-active.png",
+				"text": "分类"
 			},
 			{
 				"pagePath": "pages/grid/grid",
-				"iconPath": "static/tabbar/grid.png",
-				"selectedIconPath": "static/tabbar/grid_active.png",
+				"iconPath": "static/tabbar/cart.png",
+				"selectedIconPath": "static/tabbar/cart-active.png",
 				"text": "宫格"
 			},
 			{
 				"pagePath": "pages/ucenter/ucenter",
-				"iconPath": "static/tabbar/me.png",
-				"selectedIconPath": "static/tabbar/me_active.png",
+				"iconPath": "static/tabbar/my.png",
+				"selectedIconPath": "static/tabbar/my-active.png",
 				"text": "我的"
 			}
 		]
