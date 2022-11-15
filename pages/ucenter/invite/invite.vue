@@ -108,9 +108,9 @@
 	}
 
 	.logoImg {
-		margin-bottom: 10upx;
-		width: 160upx;
-		height: 160upx;
+		margin-bottom: 10rpx;
+		width: 160rpx;
+		height: 160rpx;
 		border-radius: 15px;
 	}
 
@@ -126,7 +126,7 @@
 	}
 
 	.copyright {
-		width: 750upx;
+		width: 750rpx;
 		font-size: 32rpx;
 		flex-direction: column;
 		justify-content: center;

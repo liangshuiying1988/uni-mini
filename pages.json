@@ -36,21 +36,42 @@
 			}
 		},
 		{
-			"path": "pages/ucenter/about/about",
+			"path": "pages/order/order",
 			"style": {
-				"navigationBarTitleText": "关于"
-				// #ifdef APP-PLUS
-				,
+				"navigationBarTitleText": "我的订单",
 				"app-plus": {
-					"titleNView": {
-						"buttons": [
-							{
-								"type": "share"
-							}
-						]
-					}
+					"bounce": "none"
 				}
-				// #endif
+			}
+		},
+		{
+			"path": "pages/order/createOrder",
+			"style": {
+				"navigationBarTitleText": "创建订单"
+			}
+		},
+		{
+			"path": "pages/address/address",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		},
+		{
+			"path": "pages/address/addressManage",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path": "pages/money/pay",
+			"style": {
+				"navigationBarTitleText": "支付"
+			}
+		},
+		{
+			"path": "pages/money/paySuccess",
+			"style": {
+				"navigationBarTitleText": "支付成功"
 			}
 		},
 		{
@@ -81,13 +102,6 @@
 			"path": "pages/ucenter/settings/settings",
 			"style": {
 				"navigationBarTitleText": "设置"
-			}
-		},
-		{
-			"path": "pages/ucenter/invite/invite",
-			"style": {
-				"navigationStyle": "custom",
-				"enablePullDownRefresh": false
 			}
 		},
 		{
