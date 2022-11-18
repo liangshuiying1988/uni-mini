@@ -39,11 +39,11 @@
 			</unicloud-db>
 		</view>
 
-		<!-- 猜你喜欢 -->
+		<!-- 热门推荐 -->
 		<view class="f-header m-t">
-			<text class="iconfont icon-cainixihuanfuben like" />
+			<text class="iconfont icon-huore hot" />
 			<view class="tit-box">
-				<text class="tit">猜你喜欢</text>
+				<text class="tit">热门推荐</text>
 			</view>
 			<text class="iconfont icon-gengduo more" />
 		</view>
@@ -54,10 +54,10 @@
 				@click="navToDetailPage(item)"
 			>
 				<view class="image-wrapper">
-					<image :src="item.image2" mode="aspectFill"></image>
+					<image :src="item.goods_thumb" mode="aspectFill"></image>
 				</view>
-				<text class="title">{{item.title}}</text>
-				<text class="price">￥{{item.price}}</text>
+				<text class="title">{{item.name}}</text>
+				<text class="price">￥{{item.minPrice}} 起</text>
 			</view>
 		</view>
 
@@ -66,7 +66,6 @@
 
 <script>
 import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
-import JsonData  from "@/Json.js"
 
 import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
 const gps = new Gps(); //定位
@@ -88,8 +87,7 @@ export default {
 	watch: {
 	},
 	onReady() {
-		this.goodsList = JsonData.goodsList;
-		console.log('goodsList======',this.goodsList)
+		this.gtGoodList();
 	},
 	async onShow() {
 		this.keyword = getApp().globalData.searchText
@@ -115,10 +113,37 @@ export default {
 		// uni.hideLoading()
 	},
 	methods: {
+		findLowerPrice(list) { // 找最低价
+			let copyList = JSON.parse(JSON.stringify(list));
+			if (list.length) {
+				list.map((item,index) => {
+					let minMun = 0;
+					if (item.goods_sku.length) {
+						item.goods_sku.map((i,idx) => {
+							if (idx === 0) {
+								minMun = i.price
+							} else {
+								if (i.price < minMun) {
+									minMun = i.price
+								}
+							}
+						})
+						copyList[index].minPrice = minMun;
+					}
+				})
+			}
+			return copyList
+		},
+		async gtGoodList() {
+			const res = await uniCloud.database().collection('open-goods')
+				.field('goods_sku,name,_id,goods_thumb').get();
+			const list = res.result.data;
+			this.goodsList = this.findLowerPrice(list);
+			console.log('goodsList=========',this.goodsList)
+		},
 		//详情页
 		navToDetailPage(item) {
-			//测试数据没有写id，用title代替
-			let id = item.title;
+			let id = item._id;
 			uni.navigateTo({
 				url: `/pages/product/product?id=${id}`
 			})
@@ -219,7 +244,7 @@ export default {
 	height: 100rpx;
 	padding: 30rpx 30rpx 8rpx;
 	background: #fff;
-	.like{
+	.hot{
 		color:$uni-color-primary;
 		font-size: $uni-img-size-base;
 		font-weight: 700;
@@ -232,7 +257,7 @@ export default {
 		flex-direction: column;
 	}
 	.tit,.more{
-		font-size: $uni-img-size-base +2rpx;
+		font-size: $uni-img-size-base;
 		color: $uni-text-color;
 	}
 }
