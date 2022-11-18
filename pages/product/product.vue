@@ -195,39 +195,39 @@ const dbCollName = 'open-goods';
 				return res;
 			},
 			getDetail(id) {
-      uni.showLoading({
-        mask: true
-      })
-      db.collection(dbCollName).doc(id).field('goods_sku,name,_id,goods_thumb,goods_desc,goods_banner_imgs').get().then((res) => {
-        const data = res.result.data[0]
-				if (data) {
-					this.imgList = data.goods_banner_imgs;
+				uni.showLoading({
+					mask: true
+				})
+				db.collection(dbCollName).doc(id).field('goods_sku,name,_id,goods_thumb,goods_desc,goods_banner_imgs').get().then((res) => {
+					const data = res.result.data[0]
+					if (data) {
+						this.imgList = data.goods_banner_imgs;
 
-					//详情内容处理
-					let html = '<p>';
-					data.goods_banner_imgs.forEach((val) => {
-						html += "<img style ='width:100%' src=" + val + " />";
+						//详情内容处理
+						let html = '<p>';
+						data.goods_banner_imgs.forEach((val) => {
+							html += "<img style ='width:100%' src=" + val + " />";
+						})
+						this.desc = html+'</p>'; 
+						this.name = data.name;
+
+						// 将goods_sku处理成页面想要的数据格式
+						const specList = this.changeData(data.goods_sku);
+						this.img = data.goods_thumb;
+						this.specList = specList;
+						this.selectedColor = specList.sizes[0].colors;
+						this.specSelected = this.selectedColor[0];
+						console.log('selectedColor==========',this.selectedColor)
+					}
+				}).catch((err) => {
+					uni.showModal({
+						content: err.message || '请求服务失败',
+						showCancel: false
 					})
-					this.desc = html+'</p>'; 
-					this.name = data.name;
-
-					// 将goods_sku处理成页面想要的数据格式
-					const specList = this.changeData(data.goods_sku);
-					this.img = data.goods_thumb;
-					this.specList = specList;
-					this.selectedColor = specList.sizes[0].colors;
-					this.specSelected = this.selectedColor[0];
-					console.log('selectedColor==========',this.selectedColor)
-        }
-      }).catch((err) => {
-        uni.showModal({
-          content: err.message || '请求服务失败',
-          showCancel: false
-        })
-      }).finally(() => {
-        uni.hideLoading()
-      })
-    },
+				}).finally(() => {
+					uni.hideLoading()
+				})
+			},
 			//规格弹窗开关
 			toggleSpec() {
 				if(this.specClass === 'show'){

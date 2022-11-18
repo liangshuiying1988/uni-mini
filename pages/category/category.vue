@@ -13,8 +13,8 @@
 			<view v-for="sitem in rightList" :key="sitem._id" class="s-list" :id="sitem._id">
 				<text class="s-item">{{sitem.name}}</text>
 				<view class="t-list" v-if="sitem.children">
-					<view v-for="titem in sitem.children" @click="navToList(sitem._id, titem._id)" class="t-item" :key="titem._id">
-						<image :src="titem.icon"></image>
+					<view v-for="titem in sitem.children" @click="navToList(titem._id)" class="t-item" :key="titem._id">
+						<image :src="titem.icon" />
 						<text>{{titem.name}}</text>
 					</view>
 				</view>
@@ -68,9 +68,9 @@
 				this.rightList = this.cateList.filter(i => i._id === item._id)[0].children;
 				// console.log('this.rightList===========',this.cateList,this.rightList)
 			},
-			navToList(sid, tid){
+			navToList(id){
 				uni.navigateTo({
-					url: `/pages/product/list?fid=${this.currentId}&sid=${sid}&tid=${tid}`
+					url: `/pages/product/list?id=${id}`
 				})
 			}
 		}

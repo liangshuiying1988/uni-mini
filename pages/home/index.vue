@@ -66,7 +66,7 @@
 
 <script>
 import statusBar from "@/uni_modules/uni-nav-bar/components/uni-nav-bar/uni-status-bar";
-
+import { findLowerPrice } from '@/utils/util.js';
 import Gps from '@/uni_modules/json-gps/js_sdk/gps.js';
 const gps = new Gps(); //定位
 
@@ -113,32 +113,11 @@ export default {
 		// uni.hideLoading()
 	},
 	methods: {
-		findLowerPrice(list) { // 找最低价
-			let copyList = JSON.parse(JSON.stringify(list));
-			if (list.length) {
-				list.map((item,index) => {
-					let minMun = 0;
-					if (item.goods_sku.length) {
-						item.goods_sku.map((i,idx) => {
-							if (idx === 0) {
-								minMun = i.price
-							} else {
-								if (i.price < minMun) {
-									minMun = i.price
-								}
-							}
-						})
-						copyList[index].minPrice = minMun;
-					}
-				})
-			}
-			return copyList
-		},
 		async gtGoodList() {
 			const res = await uniCloud.database().collection('open-goods')
 				.field('goods_sku,name,_id,goods_thumb').get();
 			const list = res.result.data;
-			this.goodsList = this.findLowerPrice(list);
+			this.goodsList = findLowerPrice(list);
 			console.log('goodsList=========',this.goodsList)
 		},
 		//详情页
