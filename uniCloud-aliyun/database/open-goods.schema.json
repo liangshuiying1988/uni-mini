@@ -1,11 +1,17 @@
 {
 	"bsonType": "object",
-	"required": ["goods_sku", "category_id", "name", "is_on_sale", "is_hot"],
+	"required": [
+		"goods_sku",
+		"category_id",
+		"name",
+		"is_on_sale",
+		"is_hot"
+	],
 	"permission": {
-		"read": "doc.is_on_sale == true",
-		"create": false,
-		"update": false,
-		"delete": false
+		"read": true,
+		"create": true,
+		"update": true,
+		"delete": true
 	},
 	"properties": {
 		"_id": {

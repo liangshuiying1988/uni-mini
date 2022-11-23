@@ -1,0 +1,41 @@
+{
+	"bsonType": "object",
+	"required": [
+		"sku_id",
+		"goods_id",
+		"user_id",
+		"goods_num"
+	],
+	"permission": {
+		"read": true,
+		"create": true,
+		"update": true,
+		"delete": true
+	},
+	"properties": {
+		"_id": {
+			"description": "存储文档 ID（订单商品 ID），系统自动生成"
+		},
+		"goods_id": {
+			"bsonType": "string",
+			"description": "分类 id，参考`open-goods`表",
+			"foreignKey": "open-goods._id"
+		},
+		"sku_id": {
+			"bsonType": "string",
+			"description": "商品的唯一货号",
+			"title": "货号"
+		},
+		"goods_num": {
+			"bsonType": "number",
+			"description": "数量",
+			"title": "数量"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "用户id，参考`uni-id-users`表",
+			"foreignKey": "uni-id-users._id"
+		}
+	},
+	"version": "0.0.1"
+}

@@ -31,6 +31,7 @@
 					<text class="selected-text">
 						{{specSelected.size}}
 						{{specSelected.color ? specSelected.color : ''}}
+						{{specSelected.good_num ? (specSelected.good_num +'件') : ''}}
 					</text>
 				</view>
 				<text class="iconfont icon-gengduo" />
@@ -74,7 +75,7 @@
 			
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn">加入购物车</button>
+				<button type="primary" class=" action-btn no-border add-cart-btn" @click="addCart">加入购物车</button>
 			</view>
 		</view>
 		
@@ -128,6 +129,20 @@
 									{{item.color}}
 								</text>
 							</view>
+
+							<!-- 数量 -->
+							<view class="item-list">
+								<text class="tit tit2">数量</text>
+								<text class="tit num">
+									<uni-number-box 
+										:min="1" 
+										:max="specSelected.num"
+										:value="specSelected.good_num"
+										:index="index"
+										@eventChange="numberChange"
+									/>
+								</text>
+							</view>
 						</view>
 					</view>
 					<button class="btn" @click="toggleSpec">完成</button>
@@ -138,13 +153,20 @@
 </template>
 
 <script>
-const db = uniCloud.database();
-const dbCollName = 'open-goods';
-	export default{
+	import uniNumberBox from '@/components/uni-number-box.vue'
+	const db = uniCloud.database();
+	const dbCollName = 'open-goods';
+	const dbCartName = 'open-cart';
+	export default {
+		components: {
+			uniNumberBox
+		},
 		data() {
 			return {
 				specClass: 'none',
-				specSelected: {}, // 选中的规格数据，尺码颜色等
+				specSelected: {
+					good_num:1
+				}, // 选中的规格数据，尺码颜色等
 				favorite: true,
 				desc: '',
 				name: '',
@@ -217,6 +239,7 @@ const dbCollName = 'open-goods';
 						this.specList = specList;
 						this.selectedColor = specList.sizes[0].colors;
 						this.specSelected = this.selectedColor[0];
+						this.specSelected.good_num = 1;
 						console.log('selectedColor==========',this.selectedColor)
 					}
 				}).catch((err) => {
@@ -244,10 +267,12 @@ const dbCollName = 'open-goods';
 				this.specSelected.size = size
 				this.selectedColor = colors
 				this.specSelected = colors[0]
+				this.specSelected.good_num = 1;
 			},
 			//选择颜色
 			selectSpec(item) {
 				this.specSelected = item
+				this.specSelected.good_num = 1;
 			},
 			//收藏
 			toFavorite(){
@@ -257,6 +282,26 @@ const dbCollName = 'open-goods';
 				uni.navigateTo({
 					url: `/pages/order/createOrder`
 				})
+			},
+			numberChange(data) {
+				this.specSelected.good_num = data.number
+			},
+			//加入购物车
+			async addCart() {
+				let hostUserInfo = uni.getStorageSync('uni-id-pages-userInfo')||{}
+				let addGoodsToCart = {
+					user_id: hostUserInfo._id,
+					goods_id: this.$page.options.id,
+					sku_id: this.specSelected.sku_id,
+					goods_num: this.specSelected.good_num
+				}
+				let res = await db.collection(dbCartName).add(addGoodsToCart);
+				if (res.result && res.result.code === 0) {
+					uni.showToast({
+						title: '加入购物车成功',
+						icon: 'icon-chenggong'
+					});
+				}
 			},
 			stopPrevent(){}
 		},
@@ -488,6 +533,16 @@ const dbCollName = 'open-goods';
 			.selected{
 				background: #fbebee;
 				color: $uni-color-primary;
+			}
+			.tit2{
+				padding: 10rpx 0 0 0;
+				background-color: #fff;
+			}
+			.num{
+				min-width: 50rpx;
+				position: relative;
+				padding-top:20rpx;
+				background-color: #fff;
 			}
 		}
 	}

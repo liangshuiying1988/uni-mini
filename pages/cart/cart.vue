@@ -9,7 +9,7 @@
 			</view>
 			<view v-else class="empty-tips">
 				空空如也
-				<view class="navigator" @click="navToLogin">去登陆></view>
+				<view class="navigator" @click="navToLogin">去登录></view>
 			</view>
 		</view>
 		<view v-else>
@@ -29,7 +29,6 @@
 								@error="onImageError('cartList', index)"
 							></image>
 							<view 
-								class="yticon icon-xuanzhong2"
 								:class="{checked: item.checked}"
 								@click="check('item', index)"
 							>
@@ -37,18 +36,18 @@
 							</view>
 						</view>
 						<view class="item-right">
-							<text class="clamp title">{{item.title}}</text>
-							<text class="attr">{{item.attr_val}}</text>
+							<text class="clamp title">{{item.name}}</text>
+							<text class="attr">{{item.color}}{{item.size}}</text>
 							<text class="price">¥{{item.price}}</text>
 							<!-- 加减组件 -->
 							<view class="button-box">
 								<uni-number-box 
 									class="step"
 									:min="1" 
-									:max="item.stock"
-									:value="item.number>item.stock?item.stock:item.number"
-									:isMax="item.number>=item.stock?true:false"
-									:isMin="item.number===1"
+									:max="item.num"
+									:value="item.goods_num"
+									:isMax="item.goods_num>=item.num ? true : false"
+									:isMin="item.goods_num===1"
 									:index="index"
 									@eventChange="numberChange"
 								/>
@@ -77,7 +76,7 @@
 						<text class="price">¥{{total}}</text>
 						<text class="coupon">
 							已优惠
-							<text>74.35</text>
+							<text>0</text>
 							元
 						</text>
 					</view>
@@ -89,10 +88,11 @@
 </template>
 
 <script>
-import { store } from '@/uni_modules/uni-id-pages/common/store.js'
+	import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 	import uniNumberBox from '@/components/uni-number-box.vue'
-	import JsonData  from "@/Json.js"
-	
+	import { findRepeatGoods } from '@/utils/util.js'
+	const db = uniCloud.database();
+	const dbname = 'open-cart,open-goods';
 	export default {
 		components: {
 			uniNumberBox
@@ -101,11 +101,14 @@ import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 			return {
 				total: 0, //总价格
 				allChecked: false, //全选状态  true|false
-				empty: false, //空白页现实  true|false
+				empty: false, //空白页  true|false
 				cartList: [],
 			};
 		},
-		onLoad(){
+		onShow(){
+			this.loadData();
+		},
+		onReady(){
 			this.loadData();
 		},
 		watch:{
@@ -118,22 +121,29 @@ import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 			}
 		},
 		computed:{
-			hasLogin(){
+			hasLogin() {
+				// console.log('store========',store)
 				return store.hasLogin
 			}
 		},
 		methods: {
 			//请求数据
-			async loadData(){
-				let list = JsonData.cartList;
-
-				let cartList = list.map(item=>{
-					item.checked = true;
-					return item;
-				});
-				this.cartList = cartList;
-				console.log('cartList============',this.cartList)
-				this.calcTotal();  //计算总价
+			async loadData() {
+				uni.showLoading({
+					mask: true
+				})
+				let a = "user_id=='" + store.userInfo._id + "'";
+				const res = await db.collection(dbname).where(a).field('goods_id{_id,goods_thumb,name,goods_sku},sku_id,goods_num').get();
+				if (res.result && res.result.data) {
+					const list = res.result.data;
+					//过滤重复商品
+					let cartList = findRepeatGoods(list);
+					this.cartList = cartList;
+					// console.log('cartList===========',cartList)
+					//计算总价
+					this.calcTotal();
+				}
+				uni.hideLoading()
 			},
 			//监听image加载完成
 			onImageLoad(key, index) {
@@ -164,25 +174,67 @@ import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 			},
 			//数量
 			numberChange(data){
-				this.cartList[data.index].number = data.number;
+				this.cartList[data.index].goods_num = data.number;
 				this.calcTotal();
 			},
 			//删除
-			deleteCartItem(index){
+			async deleteCartItem(index) {
+				uni.showLoading({
+					mask: true
+				})
 				let list = this.cartList;
 				let row = list[index];
-				let id = row.id;
+				let id = row.cart_id;
+				console.log('id========', id)
+				let idarr = id.split(',');
+				console.log('idarr========', idarr)
+				let res;
+				if (id && idarr.length > 1) { //有多个id
+					// let par = {},a;
+					const _ = db.command;
+					let par = idarr.reduce((prev, cur, index)=>{
+						console.log(prev, cur, index);
+						return  '_.eq("'+prev + '").or(_.eq("' + cur +'"))'
+					})
 
-				this.cartList.splice(index, 1);
-				this.calcTotal();
-				uni.hideLoading();
+					console.log('par=============', par)
+					// idarr.forEach((item, idx) => {
+					// 	// if (idx > 0) {
+					// 	// 	a = a + '.or(_.eq("'+ item +'")';
+					// 	// } else {
+					// 	// 	a = '{"_id":' +'"_.eq("'+ item +'")';
+					// 	// }
+					// 	if (idx > 0) {
+					// 		// a = a + '.or(_.eq("' + item + '")';
+					// 		a = a.or(_.eq(+ "'" + item + "'"));
+					// 	} else {
+					// 		// a = '"_.eq("' + item + '")';
+					// 		a = _.eq(+"'" + item + "'");
+					// 	}
+					// })
+					// a = a + '"}';
+					// a = a + '"';
+					// console.log('a=============', a)
+					// par =JSON.parse(JSON.stringify(a));
+					// console.log('par=============', par)
+					// par ={_id:_.eq('637d79f36742b700010be4ae').or(_.eq('637d7a0b188fab0001de3135'))}
+					res = await db.collection('open-cart').where({ _id: par }).remove();
+				} else {
+					res = await db.collection('open-cart').doc(id).remove()
+				}
+				if (res && res.result && res.result.errCode === 0) {
+						this.loadData();
+					}
 			},
 			//清空
 			clearCart(){
 				uni.showModal({
 					content: '清空购物车？',
-					success: (e)=>{
-						if(e.confirm){
+					success: async (e)=>{
+						if (e.confirm) {
+							let a = "user_id=='" + store.userInfo._id + "'";
+							const res = await db.collection('open-cart').where(a).remove();
+							console.log('res=========',res)
 							this.cartList = [];
 						}
 					}
@@ -199,7 +251,7 @@ import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 				let checked = true;
 				list.forEach(item=>{
 					if(item.checked === true){
-						total += item.price * item.number;
+						total += item.price * item.goods_num;
 					}else if(checked === true){
 						checked = false;
 					}
@@ -210,22 +262,10 @@ import { store } from '@/uni_modules/uni-id-pages/common/store.js'
 			//创建订单
 			createOrder(){
 				let list = this.cartList;
-				let goodsData = [];
-				list.forEach(item=>{
-					if(item.checked){
-						goodsData.push({
-							attr_val: item.attr_val,
-							number: item.number
-						})
-					}
-				})
-
+				uni.setStorageSync('CARTLIST', list)
 				uni.navigateTo({
-					url: `/pages/order/createOrder?data=${JSON.stringify({
-						goodsData: goodsData
-					})}`
+					url: '/pages/order/createOrder'
 				})
-				this.$api.msg('跳转下一页 sendData');
 			}
 		}
 	}
