@@ -1,0 +1,95 @@
+{
+	"bsonType": "object",
+	"required": [
+		"user_id",
+		"pay_type",
+		"total_fee",
+		"status",
+		"create_time",
+		"info",
+		"goodsInOrder"
+	],
+	"permission": {
+		"create": true,
+		"delete": true,
+		"read": true,
+		"update": true
+	},
+	"properties": {
+		"_id": {
+			"description": "存储文档 ID（统一订单 ID），系统自动生成"
+		},
+		"pay_type": {
+			"bsonType": "int",
+			"description": "支付渠道，1:wxpay | 2:alipay"
+		},
+		"total_fee": {
+			"bsonType": "double",
+			"description": "订单总金额，单位：分。"
+		},
+		"goodsInOrder": {
+			"bsonType": "array",
+			"description": "订单商品ID、商品sku,及数量 open-goods表"
+		},
+		"user_id": {
+			"bsonType": "string",
+			"description": "下单用户ID，uni-id-users表",
+			"foreignKey": "uni-id-users._id"
+		},
+		"platform": {
+			"bsonType": "string",
+			"description": "下单平台类型：h5、mp-weixin、mp-alipay、app-plus等"
+		},
+		"outTradeNo": {
+			"bsonType": "string",
+			"description": "外部交易单号"
+		},
+		"status": {
+			"bsonType": "int",
+			"minimum": 1,
+			"maximum": 5,
+			"description": "订单状态，1：待付款，2：已付款（待发货），3：待收货，4：退款中、售后中，5：已完成"
+		},
+		"is_refund": {
+			"bsonType": "bool",
+			"description": "是否是退款订单"
+		},
+		"refund_amount": {
+			"bsonType": "int",
+			"description": "退款金额（非退款订单表示已退款总金额，退款订单表示该笔退款的退款金额），单位：分"
+		},
+		"refund_count": {
+			"bsonType": "int",
+			"description": "总退款笔数（非退款订单有值）"
+		},
+		"create_time": {
+			"bsonType": "timestamp",
+			"description": "订单创建时间"
+		},
+		"update_time": {
+			"bsonType": "timestamp",
+			"description": "订单更新时间"
+		},
+		"paid_time": {
+			"bsonType": "timestamp",
+			"description": "订单付款时间"
+		},
+		"refund_time": {
+			"bsonType": "timestamp",
+			"description": "订单完成退款时间"
+		},
+		"refund_desc": {
+			"bsonType": "string",
+			"description": "退款原因"
+		},
+		"transaction_id": {
+			"bsonType": "string",
+			"description": "微信或支付宝交易单号"
+		},
+		"info": {
+			"bsonType": "string",
+			"description": "自定义的订单拓展信息，如快递信息等"
+		}
+	},
+	"version": "0.0.1"
+}

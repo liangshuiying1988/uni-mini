@@ -77,7 +77,7 @@
 				<text class="price-tip">￥</text>
 				<text class="price">{{tealTotal}}</text>
 			</view>
-			<text class="submit" @click="submit">提交订单</text>
+			<text class="submit" @click="submit">去付款</text>
 		</view>
 		
 		<!-- 优惠券面板 -->
@@ -85,7 +85,7 @@
 			<view class="mask-content" @click.stop.prevent="stopPrevent">
 				<!-- 优惠券页面 -->
 				<view class="coupon-item" v-for="item in couponList" :key="item.id" 
-					@click="selCoupon(item)" :class="item.id === selectedCou.id ? 'active':''">
+				@click="selCoupon(item)" :class="item.id === selectedCou.id ? 'active': ''">
 					<view class="con">
 						<view class="left">
 							<text class="title">{{item.title}}</text>
@@ -103,11 +103,13 @@
 				</view>
 			</view>
 		</view>
-
 	</view>
 </template>
-
 <script>
+	import { store } from '@/uni_modules/uni-id-pages/common/store.js'
+	const db = uniCloud.database();
+	const dbCollName = 'order';
+	const dbCartName = 'open-cart';
 	export default {
 		data() {
 			return {
@@ -140,8 +142,8 @@
 					default: true,
 				},
 				orderList: [],
-				total: 0,
-				tealTotal: 0,
+				total: 0, //总价，未减去优惠券的价格
+				tealTotal: 0, //实付金额
 				selectedCou: {}
 			}
 		},
@@ -171,10 +173,44 @@
 			changePayType(type){
 				this.payType = type;
 			},
-			submit(){
-				uni.redirectTo({
-					url: '/pages/money/pay'
+			// 提交订单详细信息到数据库，状态为未支付，还需将cart表里的对应商品删除，然后跳转到支付页
+			async submit() {
+				uni.showLoading({
+					mask: true
 				})
+				let goodsInOrder = [], cart_id = '';
+				// console.log('this.orderList=========', this.orderList)
+				this.orderList.map((item) => {
+					cart_id += item.cart_id;
+					goodsInOrder.push({ id: item.goods_id, sku_id: item.sku_id, amount: item.goods_num })
+				});
+				
+
+				let pars = {
+					user_id: store.userInfo._id,
+					pay_type: this.payType,
+					total_fee: this.tealTotal,
+					status: 1,
+					info: JSON.stringify(this.addressData),
+					goodsInOrder: goodsInOrder,
+					create_time:Date.now()
+				};
+
+				let res = await db.collection(dbCollName).add(pars); 
+				//新增订单成功后，删除购物车数据，跳转到付款页面
+				if (res.result && res.result.code === 0) {
+					let idarr = cart_id.split(',');
+					if (idarr.length > 1) { //有多个id
+						const _ = db.command;
+						await db.collection(dbCartName).where({ _id: _.in(idarr) }).remove();
+					} else {
+						await db.collection(dbCartName).doc(cart_id).remove();
+					}
+					uni.hideLoading();
+					uni.redirectTo({
+						url: '/pages/money/pay?id='+res.result.id
+					})
+				}
 			},
 			//计算总价、实付金额
 			calcTotal(){
@@ -188,8 +224,8 @@
 					total += item.price * item.goods_num;
 				})
 				let tealTotal = this.selectedCou.price ?  (total - this.selectedCou.price) : total;
-				this.total = Number(total.toFixed(2));
-				this.tealTotal = Number(tealTotal.toFixed(2));
+				this.total = Number(total.toFixed(2)); 
+				this.tealTotal = Number(tealTotal.toFixed(2)); 
 			},
 			stopPrevent(){}
 		}

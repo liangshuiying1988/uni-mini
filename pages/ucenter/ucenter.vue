@@ -3,22 +3,24 @@
 		<uni-sign-in ref="signIn"></uni-sign-in>
 		<view class="userInfo" @click.capture="toUserInfo">
 			<cloud-image width="150rpx" height="150rpx" v-if="hasLogin&&userInfo.avatar_file&&userInfo.avatar_file.url" :src="userInfo.avatar_file.url"></cloud-image>
-			<image v-else class="logo-img" src="@/static/uni-center/defaultAvatarUrl.png"></image>
+			<image v-else class="logo-img" src="@/static/uni-center/defaultAvatarUrl.png" />
 			<view class="logo-title">
 				<text class="uer-name" v-if="hasLogin">{{userInfo.nickname||userInfo.username||userInfo.mobile}}</text>
 				<text class="uer-name" v-else>{{$t('mine.notLogged')}}</text>
 			</view>
 		</view>
-		<uni-grid class="grid" :column="4" :showBorder="false" :square="true">
-			<uni-grid-item class="item" v-for="(item,index) in gridList" @click.native="tapGrid(index)" :key="index">
-				<uni-icons class="icon" color="#007AFF" :type="item.icon" size="26"></uni-icons>
+		<uni-grid class="grid" :column="5" :showBorder="false" :square="true">
+			<uni-grid-item class="item" v-for="(item,index) in gridList" @click.native="tapGrid(item)" :key="index">
+				<uni-badge :text="badges[item.state]" class="uni-badge-left-margin" absolute="rightTop" size="small">
+					<uni-icons custom-prefix="iconfont" class="icon" color="#333" :type="item.icon" size="26" />
+				</uni-badge>
 				<text class="text">{{item.text}}</text>
 			</uni-grid-item>
 		</uni-grid>
 		<uni-list class="center-list" v-for="(sublist , index) in ucenterList" :key="index">
 			<uni-list-item v-for="(item,i) in sublist" :title="item.title" link :rightText="item.rightText" :key="i"
 				:clickable="true" :to="item.to" @click="ucenterListClick(item)" :show-extra-icon="true"
-				:extraIcon="{type:item.icon,color:'#999'}">
+				:extraIcon="{type:item.icon,color:'#333'}">
 				<template v-slot:footer>
 					<view v-if="item.showBadge" class="item-footer">
 						<text class="item-footer-text">{{item.rightText}}</text>
@@ -39,8 +41,7 @@
 	// #endif
 	const db = uniCloud.database();
 	import {
-		store,
-		mutations
+		store
 	} from '@/uni_modules/uni-id-pages/common/store.js'
 	export default {
 		// #ifdef APP
@@ -56,43 +57,48 @@
 		data() {
 			return {
 				gridList: [{
-						"text": this.$t('mine.showText'),
-						"icon": "chat"
+						"text": '全部订单',
+						"icon": "icon-quanbudingdanmb",
+						"state":0
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "cloud-upload"
+						"text": "待付款",
+						"icon": "icon-dingdandaifukuan",
+						"state":1
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "contact"
+						"icon": "icon-daifahuo",
+						"text": '待发货',
+						"state":2
 					},
 					{
-						"text": this.$t('mine.showText'),
-						"icon": "download"
+						"icon": "icon-daishouhuo",
+						"text": '待收货',
+						"state":3
+					},
+					{
+						"text": "售后/退款",
+						"icon": "icon-tuikuan",
+						"state":4
 					}
 				],
 				ucenterList: [
 					[
 						// #ifdef APP-PLUS
 						{
-							"title": this.$t('mine.toEvaluate'),
+							"title": this.$t('mine.toEvaluate'), //去评分
 							"event": 'gotoMarket',
 							"icon": "hand-thumbsup"
 						},
 						//#endif
 						{
-							"title": this.$t('mine.myScore'),
+							"title": this.$t('mine.myScore'), //我的积分
 							"to": '',
 							"event": 'getScore',
 							"icon": "paperplane"
 						}
 					],
 					[{
-						"title": this.$t('mine.feedback'),
-						"to": '/uni_modules/uni-feedback/pages/opendb-feedback/opendb-feedback',
-						"icon": "help"
-					}, {
 						"title": this.$t('mine.settings'),
 						"to": '/pages/ucenter/settings/settings',
 						"icon": "gear"
@@ -112,25 +118,27 @@
 						"style": "solid", // 边框样式
 						"radius": "100%" // 边框圆角，支持百分比
 					}
-				}
+				},
+				badges: {}
 			}
 		},
 		onLoad() {
 			//#ifdef APP-PLUS
 			this.ucenterList[this.ucenterList.length - 2].unshift({
-				title:this.$t('mine.checkUpdate'),// this.this.$t('mine.checkUpdate')"检查更新"
+				title:this.$t('mine.checkUpdate'),//"检查更新"
 				rightText: this.appVersion.version + '-' + this.appVersion.versionCode,
 				event: 'checkVersion',
 				icon: 'loop',
 				showBadge: this.appVersion.hasNew
 			})
 			//#endif
+			this.loadData()
 		},
 		onShow() {
 		},
 		computed: {
 			userInfo() {
-				console.log('userInfo==========',store.userInfo)
+				// console.log('userInfo==========',store.userInfo)
 				return store.userInfo
 			},
 			hasLogin(){
@@ -146,6 +154,42 @@
 			}
 		},
 		methods: {
+			loadData() {
+				uni.showLoading({
+					mask: true
+				})
+				uniCloud.callFunction({
+					name: 'get-order-detail',
+					data: {
+						state:0
+					}
+				}).then((res) => {
+					uni.hideLoading()
+					let orderList = res.result;
+					// console.log('orderList==========', orderList)
+					if (orderList.length) {
+						let badges = {
+							'0':orderList.length
+						}
+						orderList.forEach((item) => {
+							if (badges[item.status]) {
+								badges[item.status] +=1
+							} else {
+								badges[item.status]= 1
+							}
+						})
+						this.badges = badges;
+						// console.log('badges=========',badges)
+					}
+				}).catch((err) => {
+					console.log(err);
+					uni.hideLoading()
+					uni.showModal({
+						content: err.message || '获取订单失败',
+						showCancel: false
+					})
+				})	
+			},
 			toSettings() {
 				uni.navigateTo({
 					url: "/pages/ucenter/settings/settings"
@@ -176,12 +220,10 @@
 					url: '/uni_modules/uni-id-pages/pages/userinfo/userinfo'
 				})
 			},
-			tapGrid(index) {
-				uni.showToast({
-					// title: '你点击了，第' + (index + 1) + '个',
-					title: this.$t('mine.clicked') + " " + (index + 1) ,
-					icon: 'none'
-				});
+			tapGrid(item) {
+				uni.navigateTo({
+					url: '/pages/order/order?state='+ item.state
+				})
 			},
 			/**
 			 * 去应用市场评分
@@ -249,7 +291,6 @@
 				let {
 					appName,
 					logo,
-					company,
 					slogan
 				} = this.appConfig.about
 				// #ifdef APP-PLUS

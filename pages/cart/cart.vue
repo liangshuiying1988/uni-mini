@@ -5,7 +5,7 @@
 			<image src="/static/emptyCart.jpg" mode="aspectFit"></image>
 			<view v-if="hasLogin" class="empty-tips">
 				空空如也
-				<navigator class="navigator" v-if="hasLogin" url="../index/index" open-type="switchTab">随便逛逛></navigator>
+				<navigator class="navigator" v-if="hasLogin" url="../home/index" open-type="switchTab">随便逛逛></navigator>
 			</view>
 			<view v-else class="empty-tips">
 				空空如也
@@ -185,46 +185,17 @@
 				let list = this.cartList;
 				let row = list[index];
 				let id = row.cart_id;
-				console.log('id========', id)
 				let idarr = id.split(',');
-				console.log('idarr========', idarr)
 				let res;
 				if (id && idarr.length > 1) { //有多个id
-					// let par = {},a;
 					const _ = db.command;
-					let par = idarr.reduce((prev, cur, index)=>{
-						console.log(prev, cur, index);
-						return  '_.eq("'+prev + '").or(_.eq("' + cur +'"))'
-					})
-
-					console.log('par=============', par)
-					// idarr.forEach((item, idx) => {
-					// 	// if (idx > 0) {
-					// 	// 	a = a + '.or(_.eq("'+ item +'")';
-					// 	// } else {
-					// 	// 	a = '{"_id":' +'"_.eq("'+ item +'")';
-					// 	// }
-					// 	if (idx > 0) {
-					// 		// a = a + '.or(_.eq("' + item + '")';
-					// 		a = a.or(_.eq(+ "'" + item + "'"));
-					// 	} else {
-					// 		// a = '"_.eq("' + item + '")';
-					// 		a = _.eq(+"'" + item + "'");
-					// 	}
-					// })
-					// a = a + '"}';
-					// a = a + '"';
-					// console.log('a=============', a)
-					// par =JSON.parse(JSON.stringify(a));
-					// console.log('par=============', par)
-					// par ={_id:_.eq('637d79f36742b700010be4ae').or(_.eq('637d7a0b188fab0001de3135'))}
-					res = await db.collection('open-cart').where({ _id: par }).remove();
+					res = await db.collection('open-cart').where({ _id: _.in(idarr) }).remove();
 				} else {
 					res = await db.collection('open-cart').doc(id).remove()
 				}
 				if (res && res.result && res.result.errCode === 0) {
-						this.loadData();
-					}
+					this.loadData();
+				}
 			},
 			//清空
 			clearCart(){
@@ -234,7 +205,7 @@
 						if (e.confirm) {
 							let a = "user_id=='" + store.userInfo._id + "'";
 							const res = await db.collection('open-cart').where(a).remove();
-							console.log('res=========',res)
+							// console.log('res=========',res)
 							this.cartList = [];
 						}
 					}

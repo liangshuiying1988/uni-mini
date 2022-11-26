@@ -29,12 +29,14 @@ export function findRepeatGoods(list) {
   if (copyList.length) {
     //先将多维数据转换成1维数组
     copyList.forEach((item, idx) => {
+      console.log('item===========', item)
       let selectedSku = item.goods_id[0].goods_sku.filter(i => i.sku_id === item.sku_id);
       res[idx] = selectedSku[0];
       res[idx].checked = true;
       res[idx].goods_num = item.goods_num;
       res[idx].image = item.goods_id[0].goods_thumb;
       res[idx].name = item.goods_id[0].name;
+      res[idx].goods_id = item.goods_id[0]._id;
       res[idx].cart_id = item._id;
       // cart数据库表里的_id：2个商品重复但在cart表中的_id不同，保存起来，后期支付后要删除cart表的这个数据
     });
