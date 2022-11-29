@@ -25,11 +25,6 @@
 						<view class="i-top b-b">
 							<text class="time">{{item.time}}</text>
 							<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-							<text 
-								v-if="item.state===9" 
-								class="del-btn yticon icon-iconfontshanchu1"
-								@click="deleteOrder(index)"
-							></text>
 						</view>
 						
 						<scroll-view v-if="item.goodsList.length > 1" class="goods-box" scroll-x>
@@ -56,7 +51,10 @@
 						<view class="price-box">
 							<text class="num">共{{item.amount}} 件商品 实付款 {{item.total_fee}}</text>
 						</view>
-						<view class="action-box b-t" v-if="item.status !== 5">
+						<view class="action-box b-t" v-if="item.status === 9">
+							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
+						</view>
+						<view class="action-box b-t" v-else-if="item.status !== 5">
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 						</view>
 					</view>
@@ -71,6 +69,8 @@
 <script>
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 	import empty from "@/components/empty";
+	const db = uniCloud.database();
+	const dbName = 'order';
 	export default {
 		components: {
 			uniLoadMore,
@@ -138,7 +138,7 @@
 				let navItem = this.navList[index];
 				let state = navItem.state;
 
-				// console.log('source========',source,navItem)
+				console.log('source========',source,navItem)
 				if(source === 'tabChange' && navItem.loaded === true){
 					//tab切换只有第一次需要加载数据
 					return;
@@ -174,10 +174,15 @@
 								}
 								return item.state === state
 							});
+							if (source === 'refresh') {
+								console.log('refresh')
+								navItem.orderList = [];
+							}
+							
 							orderList.forEach(item => {
 								navItem.orderList.push(item);
 							})
-							console.log('navItem===========',navItem.orderList)
+							// console.log('navItem===========',navItem.orderList)
 							//loaded新字段用于表示数据加载完毕，如果为空可以显示空白页
 							this.$set(navItem, 'loaded', true);
 							navItem.loadingType = 'noMore';
@@ -204,39 +209,27 @@
 			},
 			//顶部tab点击
 			tabClick(index) {
-				console.log('index==========', index);
 				this.tabCurrentIndex = index;
 			},
 			//删除订单
-			deleteOrder(index){
+			async deleteOrder(item){
 				uni.showLoading({
-					title: '请稍后'
+					mask: true
 				})
-				setTimeout(()=>{
-					this.navList[this.tabCurrentIndex].orderList.splice(index, 1);
-					uni.hideLoading();
-				}, 600)
+				let res = await db.collection(dbName).doc(item._id).remove();
+				if (res.result && res.result.code === 0) {
+					this.loadData('refresh');
+				}
 			},
 			//取消订单
-			cancelOrder(item){
+			async cancelOrder(item) {
 				uni.showLoading({
-					title: '请稍后'
+					mask: true
 				})
-				setTimeout(()=>{
-					let {stateTip, stateTipColor} = this.orderStateExp(9);
-					item = Object.assign(item, {
-						state: 9,
-						stateTip, 
-						stateTipColor
-					})
-					
-					//取消订单后删除待付款中该项
-					let list = this.navList[1].orderList;
-					let index = list.findIndex(val=>val.id === item.id);
-					index !== -1 && list.splice(index, 1);
-					
-					uni.hideLoading();
-				}, 600)
+				let res = await db.collection(dbName).doc(item._id).update({ status: 9 });
+				if (res.result && res.result.code === 0) {
+					this.loadData('refresh');
+				}
 			},
 
 			//订单状态文字和颜色

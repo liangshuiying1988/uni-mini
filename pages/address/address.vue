@@ -13,11 +13,9 @@
 			</view>
 			<text class="yticon icon-bianji" @click.stop="addAddress('edit', item)"></text>
 		</view>
-		<text style="display:block;padding: 16rpx 30rpx 10rpx;lihe-height: 1.6;color: #fa436a;font-size: 24rpx;">
-			数据暂时写死，待后续开发
-		</text>
 		
-		<!-- <button class="add-btn" @click="addAddress('add')">新增地址</button> -->
+		
+		<button class="add-btn" @click="addAddress('add')">新增地址</button>
 	</view>
 </template>
 

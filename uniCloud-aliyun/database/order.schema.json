@@ -12,7 +12,7 @@
 	"permission": {
 		"create": true,
 		"delete": true,
-		"read": true,
+		"read": "doc.status>0",
 		"update": true
 	},
 	"properties": {
@@ -46,9 +46,9 @@
 		},
 		"status": {
 			"bsonType": "int",
-			"minimum": 1,
-			"maximum": 5,
-			"description": "订单状态，1：待付款，2：已付款（待发货），3：待收货，4：退款中、售后中，5：已完成"
+			"minimum": -5,
+			"maximum": 10,
+			"description": "订单状态，1：待付款，2：已付款（待发货），3：待收货，4：退款中、售后中，5：已完成，9：已关闭，-1：已删除"
 		},
 		"is_refund": {
 			"bsonType": "bool",
