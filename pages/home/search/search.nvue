@@ -77,7 +77,7 @@
 	 * @description uniCloud云端一体搜索模板，自带下拉候选、历史搜索、热搜。无需再开发服务器代码
 	 */
 	const searchLogDbName = 'opendb-search-log'; // 搜索记录数据库
-	const goodsDbName = 'opendb-news-articles'; // 商品数据库
+	const goodsDbName = 'open-goods'; // 商品数据库
 	const associativeSearchField = 'title'; // 联想时，搜索框值检索数据库字段名
 	const associativeField = '_id,title'; // 联想列表每一项携带的字段
 	const localSearchListKey = '__local_search_history'; //	本地历史存储字段名
