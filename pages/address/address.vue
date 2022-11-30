@@ -4,18 +4,18 @@
 			<view class="wrapper">
 				<view class="address-box">
 					<text v-if="item.default" class="tag">默认</text>
-					<text class="address">{{item.addressName}} {{item.area}}</text>
+					<text class="address">{{item.addressName}}</text>
 				</view>
 				<view class="u-box">
 					<text class="name">{{item.name}}</text>
 					<text class="mobile">{{item.mobile}}</text>
 				</view>
 			</view>
-			<text class="yticon icon-bianji" @click.stop="addAddress('edit', item)"></text>
+			<text class="iconfont icon-bianji" @click.stop="addOrEditAddress('edit', item)"></text>
 		</view>
 		
 		
-		<button class="add-btn" @click="addAddress('add')">新增地址</button>
+		<button class="add-btn" @click="addOrEditAddress('add')">新增地址</button>
 	</view>
 </template>
 
@@ -28,10 +28,16 @@
 					{
 						name: '梁水英',
 						mobile: '1348094****',
-						addressName: '西二坊14号202',
-						address: '广东省深圳市南山区沙河街道',
-						area: '白石洲',
+						addressName: '沙河街道白石洲西二坊14号202', // 门牌号
+						address: '广东省深圳市南山区',
 						default: true
+					},
+					{
+						name: '梁水英2',
+						mobile: '1348094****',
+						addressName: '沙河街道白石洲西二坊14号202',
+						address: '广东省深圳市南山区',
+						default: false
 					}
 				]
 			}
@@ -49,7 +55,8 @@
 					uni.navigateBack()
 				}
 			},
-			addAddress(type, item){
+			addOrEditAddress(type, item) {
+				console.log('type========',type,item)
 				uni.navigateTo({
 					url: `/pages/address/addressManage?type=${type}&data=${JSON.stringify(item)}`
 				})

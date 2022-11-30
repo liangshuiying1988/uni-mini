@@ -1,11 +1,11 @@
 <template>
 	<view class="content">
-		<text class="success-icon yticon icon-xuanzhong2"></text>
+		<text class="iconfont icon-chenggong success-icon"></text>
 		<text class="tit">支付成功</text>
 		
 		<view class="btn-group">
 			<navigator url="/pages/order/order?state=0" open-type="redirect" class="mix-btn">查看订单</navigator>
-			<navigator url="/pages/index/index" open-type="switchTab" class="mix-btn hollow">返回首页</navigator>
+			<navigator url="/pages/home/index" open-type="switchTab" class="mix-btn hollow">返回首页</navigator>
 		</view>
 	</view>
 </template>
@@ -31,13 +31,14 @@
 		align-items: center;
 	}
 	.success-icon{
-		font-size: 160rpx;
-		color: #fa436a;
-		margin-top: 100rpx;
+		font-size: 100rpx;
+		color: #36cb59;
+		margin-top: 120rpx;
 	}
 	.tit{
 		font-size: 38rpx;
 		color: #303133;
+		margin-top: 40rpx;
 	}
 	.btn-group{
 		padding-top: 100rpx;

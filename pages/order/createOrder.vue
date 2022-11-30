@@ -3,7 +3,7 @@
 		<!-- 地址 -->
 		<navigator url="/pages/address/address?source=1" class="address-section">
 			<view class="order-content">
-				<text class="yticon icon-shouhuodizhi"></text>
+				<text class="iconfont icon-shouhuodizhi" />
 				<view class="cen">
 					<view class="top">
 						<text class="name">{{addressData.name}}</text>
@@ -11,7 +11,7 @@
 					</view>
 					<text class="address els">{{addressData.address}} {{addressData.area}} {{addressData.addressName}}</text>
 				</view>
-				<text class="yticon icon-you"></text>
+				<text class="iconfont icon-gengduo" />
 			</view>
 		</navigator>
 
@@ -31,7 +31,7 @@
 
 		<!-- 优惠明细 -->
 		<view class="yt-list">
-			<view class="yt-list-cell b-b" @click="toggleMask('show')">
+			<view class="yt-list-cell" @click="toggleMask('show')">
 				<view class="cell-icon">
 					券
 				</view>
@@ -42,7 +42,7 @@
 				</text>
 				<text class="cell-more wanjia wanjia-gengduo-d"></text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell">
 				<view class="cell-icon hb">
 					减
 				</view>
@@ -52,15 +52,15 @@
 		</view>
 		<!-- 金额明细 -->
 		<view class="yt-list">
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell">
 				<text class="cell-tit clamp">商品金额</text>
 				<text class="cell-tip">￥{{total}}</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell">
 				<text class="cell-tit clamp">优惠金额</text>
 				<text class="cell-tip red">-￥{{selectedCou.id ? selectedCou.price :'0'}}</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
 			</view>
@@ -279,12 +279,11 @@
 
 		.address {
 			margin-top: 16rpx;
-			margin-right: 20rpx;
+			margin-right: 10rpx;
 			color: $font-color-light;
-
 		}
 
-		.icon-you {
+		.icon-gengduo {
 			font-size: 32rpx;
 			color: $font-color-light;
 			margin-right: 30rpx;
@@ -391,10 +390,6 @@
 
 		&.cell-hover {
 			background: #fafafa;
-		}
-
-		&.b-b:after {
-			left: 30rpx;
 		}
 
 		.cell-icon {

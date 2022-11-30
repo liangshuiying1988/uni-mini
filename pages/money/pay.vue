@@ -7,8 +7,8 @@
 
 		<view class="pay-type-list">
 
-			<view class="type-item b-b" @click="changePayType(1)">
-				<text class="icon yticon icon-weixinzhifu"></text>
+			<view class="type-item" @click="changePayType(1)">
+				<text class="iconfont icon-weixinzhifu"></text>
 				<view class="con">
 					<text class="tit">微信支付</text>
 					<text>推荐使用微信支付</text>
@@ -17,8 +17,8 @@
 					<radio value="" color="#fa436a" :checked='payType == 1' />
 				</label>
 			</view>
-			<view class="type-item b-b" @click="changePayType(2)">
-				<text class="icon yticon icon-alipay"></text>
+			<view class="type-item" @click="changePayType(2)">
+				<text class="iconfont icon-zhifubao"></text>
 				<view class="con">
 					<text class="tit">支付宝支付</text>
 				</view>
@@ -255,20 +255,18 @@
 			font-size: 30rpx;
 			position:relative;
 		}
-		
-		.icon{
-			width: 100rpx;
-			font-size: 52rpx;
-		}
-		.icon-erjiye-yucunkuan {
-			color: #fe8e2e;
-		}
+
 		.icon-weixinzhifu {
 			color: #36cb59;
+			font-size: 60rpx;
+			width: 80rpx;
 		}
-		.icon-alipay {
+		.icon-zhifubao {
 			color: #01aaef;
+			font-size: 46rpx;
+			width: 70rpx;
 		}
+
 		.tit{
 			font-size: $uni-font-size-lg;
 			color: $font-color-dark;

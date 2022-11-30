@@ -211,6 +211,7 @@ export default {
 				provinceCode: this._getProvinceCode(),
 				labelArr: this._getLabel().split('-')
 			};
+			console.log('emitName=========',emitName,pickObj)
 			this.$emit(emitName, pickObj);
 		},
 		_getLabel() {
@@ -253,6 +254,7 @@ export default {
 		},
 		pickerConfirm() {
 			this._$emit('onConfirm');
+
 			this.close();
 		},
 		open() {
